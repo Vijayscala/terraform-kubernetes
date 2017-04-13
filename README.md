@@ -2,7 +2,7 @@
 An attempt to build a kubernetes cluster on AWS using CoreOs AMI
 
 ### What's working?
-- Working Kubernetes Cluster
+- Generates a Kubernetes Cluster
 - Can set number of etcd/API/Worker nodes
 - CA certs for API
 - Configure local kubectl using generated certs (sh ./configure_kubectl)
