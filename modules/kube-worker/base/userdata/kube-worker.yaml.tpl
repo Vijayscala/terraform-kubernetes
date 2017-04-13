@@ -21,7 +21,7 @@ write_files:
               "isDefaultGateway": true
           }
       }
-  - path: /etc/kubernetes/manifests/kube-proxy.yam
+  - path: /etc/kubernetes/manifests/kube-proxy.yaml
     owner: "root"
     content: |
       apiVersion: v1

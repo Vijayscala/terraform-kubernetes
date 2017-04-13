@@ -12,8 +12,10 @@ resource "tls_self_signed_cert" "ca" {
 
   allowed_uses = [
     "server_auth",
+    "client_auth",
     "digital_signature",
     "key_encipherment",
+    "cert_signing",
   ]
 
   validity_period_hours = "24000"

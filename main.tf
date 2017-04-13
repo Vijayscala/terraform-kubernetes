@@ -30,7 +30,7 @@ module "kube_master" {
   vpc_id                 = "${module.vpc.vpc_id}"
   etcd_discovery_url     = "${var.etcd_discovery_url}"
   kube_master_node_count = "${var.kube_master_node_count}"
-  etcd_endpoints         = "${join(",",formatlist("http://%s:2379",split(",",module.etcd.etcd_ips)))}"
+  etcd_endpoints         = "${join(",",formatlist("http://%s:2379",split(",",module.etcd.etcd_private_ips)))}"
   dns_service_ip         = "${var.dns_service_ip}"
   service_ip_range       = "${var.service_ip_range}"
   pod_network            = "${var.pod_network}"
@@ -41,9 +41,9 @@ module "tls_kube_apiserver" {
 
   ca_private_key_pem = "${module.tls_ca.private_key_pem}"
   ca_cert_pem        = "${module.tls_ca.cert_pem}"
-  etcd_ips           = "${module.etcd.etcd_ips}"
+  etcd_ips           = "${module.etcd.etcd_private_ips}"
   k8s_service_ip     = "${var.k8s_service_ip}"
-  master_ips         = "${module.kube_master.kube_master_private_ips}"
+  master_ips         = "${module.kube_master.kube_master_public_ips}"
 }
 
 module "kube_master_add_certs_and_restart" {
@@ -66,9 +66,9 @@ module "kube_workers" {
   vpc_id                 = "${module.vpc.vpc_id}"
   etcd_discovery_url     = "${var.etcd_discovery_url}"
   kube_worker_node_count = "${var.kube_worker_node_count}"
-  etcd_endpoints         = "${join(",",formatlist("http://%s:2379",split(",",module.etcd.etcd_ips)))}"
+  etcd_endpoints         = "${join(",",formatlist("http://%s:2379",split(",",module.etcd.etcd_private_ips)))}"
   dns_service_ip         = "${var.dns_service_ip}"
-  master_ip              = "${element(split(",",module.kube_master.kube_master_private_ips), 0)}"
+  master_ip              = "${element(split(",",module.kube_master.kube_master_public_ips), 0)}"
 }
 
 module "tls_kube_worker" {
@@ -84,8 +84,8 @@ module "tls_kube_worker" {
 module "kube_worker_add_certs_and_restart" {
   source = "./modules/kube-worker/add_certs_and_restart"
 
-  worker_ips                       = "${module.kube_master.kube_master_public_ips}"
-  worker_nodes_count               = "${var.kube_master_node_count}"
+  worker_ips                       = "${module.kube_workers.kube_worker_public_ips}"
+  worker_nodes_count               = "${var.kube_worker_node_count}"
   aws_key_file                     = "${var.aws_key_file}"
   ca_cert_pem                      = "${module.tls_ca.cert_pem}"
   kube_worker_cert_pem_list        = "${module.tls_kube_worker.cert_pems}"
@@ -93,7 +93,7 @@ module "kube_worker_add_certs_and_restart" {
   kube_worker_dns_s                = "${module.kube_workers.kube_worker_private_dns_s}"
 }
 
-module "tls_kube_adminr" {
+module "tls_kube_admin" {
   source = "./modules/tls/kube-admin"
 
   ca_private_key_pem = "${module.tls_ca.private_key_pem}"

@@ -1,5 +1,5 @@
-output "etcd_ids" {
-  value = "${split(",",module.etcd.etcd_ips)}"
+output "etcd_public_ips" {
+  value = "${split(",",module.etcd.etcd_public_ips)}"
 }
 
 output "kube_master_ips" {
