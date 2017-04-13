@@ -1,0 +1,33 @@
+aws_credentials_file = "***"
+
+aws_profile = "***"
+
+aws_key_name = "***" #"coreos_test"
+
+aws_key_file = "***.pem"
+
+vpc_name = "CoreOs-VPC"
+
+vpc_cidr = "10.0.0.0/16"
+
+public_subnet_map = {
+  eu-west-1a = "10.0.0.0/24"
+  eu-west-1b = "10.0.0.1/24"
+  eu-west-1c = "10.0.0.2/24"
+}
+
+dns_service_ip = "10.3.0.10"
+
+service_ip_range = "10.3.0.0/24"
+
+pod_network = "10.2.0.0/16"
+
+k8s_service_ip = "10.3.0.1"
+
+ectd_node_count = "3"
+
+kube_master_node_count = "1"
+
+kube_worker_node_count = "3"
+
+etcd_discovery_url = "https://discovery.etcd.io/******"
