@@ -8,11 +8,9 @@ An attempt to build a kubernetes cluster on AWS using CoreOs AMI
 - Configure local kubectl using generated certs (sh ./configure_kubectl)
 
 ### Still to do?
-- Add private subnet
-- Tighten up sg rules
+- Security
 - High Availibility
-- Add dns & load balancers
-- Clean Up Code
+- Code Clean Up
 
 
 References:
