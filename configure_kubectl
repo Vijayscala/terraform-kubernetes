@@ -1,17 +1,10 @@
 #!/bin/bash
 
-function copy_cert_to_file {
-    resource=$1
-    output=$2
-
-    echo -e  $(cat terraform.tfstate | jq '.modules[].resources | {"'$resource'"}[].primary.attributes.cert_pem | select(. != null)'  | tr -d '"') | sed '$d' > $output
-}
-
 #copy certs to local file from terraform output
 [ -d ".certs" ] || mkdir .certs
-copy_cert_to_file tls_self_signed_cert.ca `pwd`/.certs/ca_cert.pem
-copy_cert_to_file tls_private_key.kube-admin `pwd`/.certs/admin_key.pem
-copy_cert_to_file tls_locally_signed_cert.kube-admin `pwd`/.certs/admin_key.pem
+echo -e  $(cat terraform.tfstate | jq '.modules[].resources | {"tls_self_signed_cert.ca"}[].primary.attributes.cert_pem | select(. != null)'  | tr -d '"') | sed '$d' > `pwd`/.certs/ca_cert.pem
+echo -e  $(cat terraform.tfstate | jq '.modules[].resources | {"tls_private_key.kube-admin"}[].primary.attributes.private_key_pem | select(. != null)'  | tr -d '"') | sed '$d' > `pwd`/.certs/admin_key.pem
+echo -e  $(cat terraform.tfstate | jq '.modules[].resources | {"tls_locally_signed_cert.kube-admin"}[].primary.attributes.cert_pem | select(. != null)'  | tr -d '"') | sed '$d' > `pwd`/.certs/admin_cert.pem
 
 #set variables
 MASTER_HOST=$(terraform output kube_master_ips)
