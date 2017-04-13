@@ -1,18 +1,36 @@
 #!/bin/bash
 
+function copy_cert_to_file {
+    resource=$1
+    output=$2
+
+    echo -e  $(cat terraform.tfstate | jq '.modules[].resources | {"'$resource'"}[].primary.attributes.cert_pem | select(. != null)'  | tr -d '"') | sed '$d' > $output
+}
+
+#copy certs to local file from terraform output
 [ -d ".certs" ] || mkdir .certs
+copy_cert_to_file tls_self_signed_cert.ca `pwd`/.certs/ca_cert.pem
+copy_cert_to_file tls_private_key.kube-admin `pwd`/.certs/admin_key.pem
+copy_cert_to_file tls_locally_signed_cert.kube-admin `pwd`/.certs/admin_key.pem
 
-echo -e  $(cat terraform.tfstate | jq '.modules[].resources | {"tls_self_signed_cert.ca"}[].primary.attributes.cert_pem | select(. != null)'  | tr -d '"') | sed '$d' > `pwd`/.certs/ca_cert.pem
-echo -e  $(cat terraform.tfstate | jq '.modules[].resources | {"tls_private_key.kube-admin"}[].primary.attributes.private_key_pem | select(. != null)'  | tr -d '"') | sed '$d' > `pwd`/.certs/admin_key.pem
-echo -e  $(cat terraform.tfstate | jq '.modules[].resources | {"tls_locally_signed_cert.kube-admin"}[].primary.attributes.cert_pem | select(. != null)'  | tr -d '"') | sed '$d' > `pwd`/.certs/admin_cert.pem
-
+#set variables
 MASTER_HOST=$(terraform output kube_master_ips)
 CA_CERT=`pwd`/.certs/ca_cert.pem
 ADMIN_KEY=`pwd`/.certs/admin_key.pem
 ADMIN_CERT=`pwd`/.certs/admin_cert.pem
 
+#configure kubectl
+kubectl config set-cluster default-cluster \
+    --server=https://${MASTER_HOST} \
+    --certificate-authority=${CA_CERT}
 
-kubectl config set-cluster default-cluster --server=https://${MASTER_HOST} --certificate-authority=${CA_CERT}
-kubectl config set-credentials default-admin --certificate-authority=${CA_CERT} --client-key=${ADMIN_KEY} --client-certificate=${ADMIN_CERT}
-kubectl config set-context default-system --cluster=default-cluster --user=default-admin
+kubectl config set-credentials default-admin \
+    --certificate-authority=${CA_CERT} \
+    --client-key=${ADMIN_KEY} \
+    --client-certificate=${ADMIN_CERT}
+
+kubectl config set-context default-system \
+    --cluster=default-cluster \
+    --user=default-admin
+
 kubectl config use-context default-system
