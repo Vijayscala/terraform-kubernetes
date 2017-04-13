@@ -10,7 +10,7 @@ An attempt to build a kubernetes cluster on AWS using CoreOs AMI
 ### Still to do?
 - Add private subnet
 - Tighten up sg rules
-- High Availibilty
+- High Availibility
 - Add dns & load balancers
 - Clean Up Code
 
