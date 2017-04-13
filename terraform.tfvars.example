@@ -2,7 +2,7 @@ aws_credentials_file = "***"
 
 aws_profile = "***"
 
-aws_key_name = "***" #"coreos_test"
+aws_key_name = "***"
 
 aws_key_file = "***.pem"
 
